@@ -2,10 +2,8 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Photo Booth PRO FIX</title>
-
+<title>Photo Booth 3 Foto</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
 
 <style>
 body{
@@ -15,19 +13,14 @@ body{
     color:white;
 }
 
-#container{
-    position:relative;
-    display:inline-block;
-}
-
 video{
-    width:640px;
-    height:480px;
+    width:480px;
+    height:360px;
     border-radius:15px;
 }
 
 button{
-    margin:15px;
+    margin:20px;
     padding:12px 25px;
     font-size:18px;
     border:none;
@@ -41,14 +34,10 @@ button{
     font-size:70px;
     font-weight:bold;
     color:#ffcc00;
-    margin:20px;
 }
 
-#qrContainer{
-    display:flex;
-    justify-content:center;
-    gap:50px;
-    margin-top:20px;
+canvas{
+    display:none;
 }
 </style>
 </head>
@@ -57,26 +46,15 @@ button{
 
 <h1>PHOTO BOOTH EVENT</h1>
 
-<div id="container">
-    <video id="video" autoplay></video>
-</div>
-
-<canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
-
+<video id="video" autoplay></video>
+<br>
 <div id="countdown"></div>
-
 <button onclick="startCapture()">📸 MULAI FOTO</button>
 
-<div id="qrContainer">
-    <div>
-        <h3>Download FOTO</h3>
-        <div id="qrFoto"></div>
-    </div>
-    <div>
-        <h3>Download GIF</h3>
-        <div id="qrGif"></div>
-    </div>
-</div>
+<canvas id="canvas"></canvas>
+
+<h3>Scan QR untuk Download</h3>
+<div id="qrcode"></div>
 
 <script>
 let video = document.getElementById("video");
@@ -103,8 +81,9 @@ function startCapture(){
 }
 
 function takePhoto(times){
-    if(times == 0){
-        createResult();
+
+    if(times === 0){
+        createFinalImage();
         return;
     }
 
@@ -115,68 +94,56 @@ function takePhoto(times){
         count--;
         countdownEl.innerHTML = count;
 
-        if(count == 0){
+        if(count === 0){
             clearInterval(interval);
 
-            ctx.drawImage(video,0,0,640,480);
+            let tempCanvas = document.createElement("canvas");
+            tempCanvas.width = 480;
+            tempCanvas.height = 360;
+            let tempCtx = tempCanvas.getContext("2d");
 
-            // Tambahkan frame
-            ctx.drawImage(frameImg,0,0,640,480);
+            tempCtx.drawImage(video,0,0,480,360);
+            tempCtx.drawImage(frameImg,0,0,480,360);
+            tempCtx.drawImage(logoImg,180,10,120,120);
 
-            // Tambahkan logo
-            ctx.drawImage(logoImg,260,20,120,120);
+            tempCtx.fillStyle = "white";
+            tempCtx.font = "bold 18px Arial";
+            tempCtx.textAlign = "center";
+            tempCtx.fillText("KEMENTERIAN HAJI DAN UMRAH",240,150);
+            tempCtx.fillText("KAB. MAGELANG",240,175);
 
-            // Tambahkan tulisan instansi
-            ctx.fillStyle = "white";
-            ctx.font = "bold 22px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText("KEMENTERIAN HAJI DAN UMRAH",320,170);
-            ctx.fillText("KAB. MAGELANG",320,200);
-
-            photos.push(canvas.toDataURL("image/png"));
+            photos.push(tempCanvas);
 
             takePhoto(times-1);
         }
     },1000);
 }
 
-function createResult(){
+function createFinalImage(){
 
-    let fotoFinal = photos[0];
+    canvas.width = 480;
+    canvas.height = 1080; // 3 x 360
+    ctx.fillStyle = "white";
+    ctx.fillRect(0,0,480,1080);
 
-    // QR FOTO
-    generateQR("qrFoto", fotoFinal);
+    ctx.drawImage(photos[0],0,0);
+    ctx.drawImage(photos[1],0,360);
+    ctx.drawImage(photos[2],0,720);
 
-    // BUAT GIF
-    let gif = new GIF({
-        workers:2,
-        quality:10,
-        width:640,
-        height:480
-    });
+    let finalImage = canvas.toDataURL("image/png");
 
-    photos.forEach(p=>{
-        let img = document.createElement("img");
-        img.src = p;
-        gif.addFrame(img,{delay:800});
-    });
+    generateQR(finalImage);
 
-    gif.on('finished',function(blob){
-        let gifURL = URL.createObjectURL(blob);
-        generateQR("qrGif", gifURL);
-        countdownEl.innerHTML = "SELESAI!";
-    });
-
-    gif.render();
+    countdownEl.innerHTML = "SELESAI!";
 }
 
-function generateQR(id, link){
-    let el = document.getElementById(id);
-    el.innerHTML = "";
-    new QRCode(el,{
+function generateQR(link){
+    let qr = document.getElementById("qrcode");
+    qr.innerHTML = "";
+    new QRCode(qr,{
         text: link,
-        width:180,
-        height:180
+        width:200,
+        height:200
     });
 }
 </script>
