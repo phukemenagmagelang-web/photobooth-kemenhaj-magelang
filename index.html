@@ -1,114 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Event Photobooth</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#111;
+    color:white;
+    text-align:center;
+}
+video{
+    width:500px;
+    border-radius:10px;
+}
+canvas{
+    display:none;
+}
+button{
+    padding:10px 20px;
+    margin:10px;
+    font-size:16px;
+}
+#resultImage{
+    width:400px;
+    margin-top:20px;
+}
+#qrcode{
+    margin-top:20px;
+}
+</style>
+</head>
+<body>
+
+<h2>Event Photobooth</h2>
+
+<input type="file" id="frameUpload" accept="image/png">
+
+<br><br>
+
+<video id="video" autoplay></video>
+
+<br>
+
+<button onclick="startCapture()">Start Photo (3x)</button>
+
+<canvas id="canvas"></canvas>
+
+<br>
+
+<img id="resultImage">
+<div id="qrcode"></div>
+
 <script>
 
-function generate4R(){
+let video = document.getElementById("video");
+let canvas = document.getElementById("canvas");
+let ctx = canvas.getContext("2d");
+let capturedPhotos = [];
+let uploadedFrame = null;
 
-  const canvasFrame = document.createElement("canvas");
-  const ctx = canvasFrame.getContext("2d");
+navigator.mediaDevices.getUserMedia({video:true})
+.then(stream => {
+    video.srcObject = stream;
+});
 
-  canvasFrame.width = 1800;
-  canvasFrame.height = 1200;
+document.getElementById("frameUpload").addEventListener("change", function(e){
+    let reader = new FileReader();
+    reader.onload = function(event){
+        uploadedFrame = new Image();
+        uploadedFrame.src = event.target.result;
+    }
+    reader.readAsDataURL(e.target.files[0]);
+});
 
-  // ===== BACKGROUND HITAM GLOSS =====
-  const bgGrad = ctx.createLinearGradient(0,0,0,1200);
-  bgGrad.addColorStop(0,"#000000");
-  bgGrad.addColorStop(0.5,"#111111");
-  bgGrad.addColorStop(1,"#000000");
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0,0,1800,1200);
+function startCapture(){
+    capturedPhotos = [];
+    capturePhoto(0);
+}
 
-  // ===== GOLD METALLIC BORDER =====
-  const gold = ctx.createLinearGradient(0,0,1800,0);
-  gold.addColorStop(0,"#8f6b29");
-  gold.addColorStop(0.5,"#ffd700");
-  gold.addColorStop(1,"#8f6b29");
+function capturePhoto(count){
+    if(count >= 3){
+        generateStrip();
+        generateGIF();
+        return;
+    }
 
-  ctx.strokeStyle = gold;
-  ctx.lineWidth = 20;
-  ctx.strokeRect(30,30,1740,1140);
+    setTimeout(()=>{
+        canvas.width = 500;
+        canvas.height = 400;
+        ctx.drawImage(video,0,0,500,400);
+        capturedPhotos.push(canvas.toDataURL("image/jpeg"));
+        capturePhoto(count+1);
+    },2000);
+}
 
-  ctx.lineWidth = 4;
-  ctx.strokeRect(80,80,1640,1040);
+function generateStrip(){
 
-  // ===== GOLD LINE DECOR =====
-  ctx.fillStyle = gold;
-  ctx.fillRect(300,170,1200,4);
-  ctx.fillRect(300,1030,1200,4);
+    let strip = document.createElement("canvas");
+    let sctx = strip.getContext("2d");
 
-  // ===== LOGO WITH GLOW =====
-  const logo = new Image();
-  logo.src = "logo.png";
+    strip.width = 600;
+    strip.height = 1200;
 
-  logo.onload = function(){
-      ctx.shadowColor = "#ffd700";
-      ctx.shadowBlur = 40;
-      ctx.drawImage(logo, 750, 70, 300, 150);
-      ctx.shadowBlur = 0;
-  }
+    sctx.fillStyle = "white";
+    sctx.fillRect(0,0,600,1200);
 
-  // ===== FOTO SECTION =====
-  let xPositions = [250, 700, 1150];
-  let loaded = 0;
+    let loaded = 0;
 
-  for(let i=0;i<3;i++){
+    capturedPhotos.forEach((photo,i)=>{
+        let img = new Image();
+        img.src = photo;
+        img.onload = function(){
+            sctx.drawImage(img,50,50+(i*350),500,300);
 
-      const img = new Image();
-      img.src = capturedPhotos[i];
+            if(uploadedFrame){
+                sctx.drawImage(uploadedFrame,0,0,600,1200);
+            }
 
-      img.onload = function(){
+            loaded++;
+            if(loaded === 3){
+                let finalImage = strip.toDataURL("image/jpeg");
+                document.getElementById("resultImage").src = finalImage;
+                generateQR(finalImage);
+            }
+        }
+    });
+}
 
-          // cinematic shadow
-          ctx.shadowColor = "rgba(0,0,0,0.9)";
-          ctx.shadowBlur = 50;
-          ctx.shadowOffsetY = 25;
+function generateGIF(){
 
-          // white luxury frame
-          ctx.fillStyle = "#ffffff";
-          ctx.fillRect(xPositions[i]-20, 320-20, 450+40, 650+40);
+    let gif = new GIF({
+        workers:2,
+        quality:10,
+        workerScript:"https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js"
+    });
 
-          ctx.shadowBlur = 0;
+    capturedPhotos.forEach(photo=>{
+        let img = new Image();
+        img.src = photo;
+        gif.addFrame(img,{delay:800});
+    });
 
-          ctx.drawImage(img, xPositions[i], 320, 450, 650);
+    gif.on('finished',function(blob){
+        let gifURL = URL.createObjectURL(blob);
+        let a = document.createElement("a");
+        a.href = gifURL;
+        a.download = "photobooth.gif";
+        a.innerText = "Download GIF";
+        document.body.appendChild(a);
+    });
 
-          loaded++;
+    gif.render();
+}
 
-          if(loaded === 3){
-
-              // ===== EMBOSS GOLD TEXT =====
-              ctx.font = "bold 44px serif";
-              ctx.textAlign = "center";
-
-              ctx.fillStyle = "#8f6b29";
-              ctx.fillText(
-                "Kementerian Haji dan Umrah Kab. Magelang",
-                900,
-                1080
-              );
-
-              ctx.fillStyle = "#ffd700";
-              ctx.fillText(
-                "Kementerian Haji dan Umrah Kab. Magelang",
-                900,
-                1075
-              );
-
-              const today = new Date();
-              ctx.font = "28px serif";
-              ctx.fillStyle = "#ffd700";
-              ctx.fillText(
-                today.toLocaleDateString("id-ID"),
-                900,
-                1120
-              );
-
-              const finalImage = canvasFrame.toDataURL("image/jpeg",1.0);
-              result.src = finalImage;
-
-              uploadToDrive(finalImage);
-              capturedPhotos = [];
-          }
-      }
-  }
-
+function generateQR(dataURL){
+    document.getElementById("qrcode").innerHTML = "";
+    new QRCode(document.getElementById("qrcode"), {
+        text: dataURL,
+        width:150,
+        height:150
+    });
 }
 
 </script>
+
+</body>
+</html>
