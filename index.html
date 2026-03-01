@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Photo Booth PRO</title>
+<title>Photo Booth PRO FIX</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
@@ -20,37 +20,10 @@ body{
     display:inline-block;
 }
 
-video, canvas{
+video{
     width:640px;
     height:480px;
     border-radius:15px;
-}
-
-#frame{
-    position:absolute;
-    top:0;
-    left:0;
-    width:640px;
-    height:480px;
-    pointer-events:none;
-}
-
-#logo{
-    position:absolute;
-    top:20px;
-    left:50%;
-    transform:translateX(-50%);
-    width:120px;
-}
-
-#instansi{
-    position:absolute;
-    top:150px;
-    left:50%;
-    transform:translateX(-50%);
-    font-weight:bold;
-    font-size:18px;
-    text-shadow:2px 2px 6px black;
 }
 
 button{
@@ -86,12 +59,9 @@ button{
 
 <div id="container">
     <video id="video" autoplay></video>
-    <canvas id="canvas" style="display:none;"></canvas>
-
-    <img id="frame" src="frame.png">
-    <img id="logo" src="logo.png">
-    <div id="instansi">KEMENTERIAN HAJI DAN UMRAH KAB. MAGELANG</div>
 </div>
+
+<canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
 
 <div id="countdown"></div>
 
@@ -113,6 +83,12 @@ let video = document.getElementById("video");
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 let countdownEl = document.getElementById("countdown");
+
+let frameImg = new Image();
+frameImg.src = "frame.png";
+
+let logoImg = new Image();
+logoImg.src = "logo.png";
 
 navigator.mediaDevices.getUserMedia({ video:true })
 .then(stream => {
@@ -142,9 +118,20 @@ function takePhoto(times){
         if(count == 0){
             clearInterval(interval);
 
-            canvas.width = 640;
-            canvas.height = 480;
             ctx.drawImage(video,0,0,640,480);
+
+            // Tambahkan frame
+            ctx.drawImage(frameImg,0,0,640,480);
+
+            // Tambahkan logo
+            ctx.drawImage(logoImg,260,20,120,120);
+
+            // Tambahkan tulisan instansi
+            ctx.fillStyle = "white";
+            ctx.font = "bold 22px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("KEMENTERIAN HAJI DAN UMRAH",320,170);
+            ctx.fillText("KAB. MAGELANG",320,200);
 
             photos.push(canvas.toDataURL("image/png"));
 
@@ -155,13 +142,17 @@ function takePhoto(times){
 
 function createResult(){
 
-    // FOTO FINAL (gabungan pertama)
     let fotoFinal = photos[0];
+
+    // QR FOTO
+    generateQR("qrFoto", fotoFinal);
 
     // BUAT GIF
     let gif = new GIF({
         workers:2,
-        quality:10
+        quality:10,
+        width:640,
+        height:480
     });
 
     photos.forEach(p=>{
@@ -172,20 +163,16 @@ function createResult(){
 
     gif.on('finished',function(blob){
         let gifURL = URL.createObjectURL(blob);
-
-        generateQR("qrFoto", fotoFinal);
         generateQR("qrGif", gifURL);
-
         countdownEl.innerHTML = "SELESAI!";
     });
 
     gif.render();
 }
 
-function generateQR(elementId, link){
-    let el = document.getElementById(elementId);
+function generateQR(id, link){
+    let el = document.getElementById(id);
     el.innerHTML = "";
-
     new QRCode(el,{
         text: link,
         width:180,
