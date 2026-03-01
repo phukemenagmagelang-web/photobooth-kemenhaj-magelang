@@ -1,193 +1,177 @@
-!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"
+<!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.2">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photo Booth - Kemenhaj Kab Magelang</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+body{
+  margin:0;
+  background:#000;
+  color:white;
+  text-align:center;
+  font-family:Arial;
+}
+
+video{
+  width:100%;
+  max-height:60vh;
+  border:5px solid gold;
+  border-radius:20px;
+}
+
+#countdown{
+  position:absolute;
+  width:100%;
+  top:40%;
+  font-size:100px;
+  color:gold;
+  font-weight:bold;
+}
+
+button{
+  padding:15px 30px;
+  font-size:18px;
+  background:gold;
+  border:none;
+  border-radius:10px;
+  margin-top:20px;
+  font-weight:bold;
+}
+
+canvas{display:none;}
+
+#result{
+  margin-top:20px;
+  width:95%;
+}
+
+#qrSection{
+  margin-top:20px;
+  display:none;
+}
+</style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1">&lt;title&gt;Photo Booth - Kemenhaj Kab Magelang&lt;/title&gt;</p>
-<p class="p1">&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"&gt;&lt;/script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;style&gt;</p>
-<p class="p1">body{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>margin:0;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>background:#000;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>color:white;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>text-align:center;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>font-family:Arial;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">video{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>width:100%;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>max-height:60vh;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>border:5px solid gold;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>border-radius:20px;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">#countdown{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>position:absolute;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>width:100%;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>top:40%;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>font-size:100px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>color:gold;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>font-weight:bold;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">button{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>padding:15px 30px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>font-size:18px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>background:gold;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>border:none;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>border-radius:10px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>margin-top:20px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>font-weight:bold;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">canvas{display:none;}</p>
-<p class="p2"><br></p>
-<p class="p1">#result{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>margin-top:20px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>width:95%;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">#qrSection{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>margin-top:20px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>display:none;</p>
-<p class="p1">}</p>
-<p class="p1">&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;h2&gt;KEMENTERIAN HAJI DAN UMRAH&lt;/h2&gt;</p>
-<p class="p1">&lt;h3&gt;KABUPATEN MAGELANG&lt;/h3&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;div style="position:relative;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;video id="video" autoplay playsinline&gt;&lt;/video&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="countdown"&gt;&lt;/div&gt;</p>
-<p class="p1">&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;canvas id="canvas"&gt;&lt;/canvas&gt;</p>
-<p class="p1">&lt;button onclick="startCountdown()"&gt;Ambil Foto&lt;/button&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;img id="result"&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;div id="qrSection"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;h3&gt;📱 Scan QR untuk Mengunduh Foto&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="qrcode"&gt;&lt;/div&gt;</p>
-<p class="p1">&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">const WEB_APP_URL = https://script.google.com/macros/s/AKfycbz55-o4m_PTZTFk_B2dtZfexxEyy-w-ORv0mEgndBeNNEClGnQrxfv0Wc4lQZ6yMMH2/exec;</p>
-<p class="p2"><br></p>
-<p class="p1">const video = document.getElementById("video");</p>
-<p class="p1">const canvas = document.getElementById("canvas");</p>
-<p class="p1">const result = document.getElementById("result");</p>
-<p class="p1">const countdownEl = document.getElementById("countdown");</p>
-<p class="p2"><br></p>
-<p class="p1">navigator.mediaDevices.getUserMedia({</p>
-<p class="p1"><span class="Apple-converted-space">  </span>video:{facingMode:"user"}</p>
-<p class="p1">}).then(stream=&gt;{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>video.srcObject = stream;</p>
-<p class="p1">});</p>
-<p class="p2"><br></p>
-<p class="p1">function startCountdown(){</p>
-<p class="p1"><span class="Apple-converted-space">  </span>let count = 3;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>countdownEl.innerText = count;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const interval = setInterval(()=&gt;{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>count--;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if(count&gt;0){</p>
-<p class="p1"><span class="Apple-converted-space">      </span>countdownEl.innerText = count;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}else{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>clearInterval(interval);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>countdownEl.innerText="";</p>
-<p class="p1"><span class="Apple-converted-space">      </span>capture();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>},1000);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function capture(){</p>
-<p class="p1"><span class="Apple-converted-space">  </span>canvas.width = video.videoWidth;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>canvas.height = video.videoHeight;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const ctx = canvas.getContext("2d");</p>
-<p class="p1"><span class="Apple-converted-space">  </span>ctx.drawImage(video,0,0);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>generate4R(canvas.toDataURL("image/jpeg",1.0));</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function generate4R(photoData){</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const layoutCanvas = document.createElement("canvas");</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const ctx = layoutCanvas.getContext("2d");</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>layoutCanvas.width = 1800;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>layoutCanvas.height = 1200;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>ctx.fillStyle="#000";</p>
-<p class="p1"><span class="Apple-converted-space">  </span>ctx.fillRect(0,0,1800,1200);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>ctx.fillStyle="gold";</p>
-<p class="p1"><span class="Apple-converted-space">  </span>ctx.font="bold 80px Arial";</p>
-<p class="p1"><span class="Apple-converted-space">  </span>ctx.textAlign="center";</p>
-<p class="p1"><span class="Apple-converted-space">  </span>ctx.fillText("KEMENTERIAN HAJI DAN UMRAH",900,120);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>ctx.fillText("KABUPATEN MAGELANG",900,200);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const img = new Image();</p>
-<p class="p1"><span class="Apple-converted-space">  </span>img.src = photoData;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>img.onload = function(){</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.drawImage(img,300,250,1200,750);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.font="40px Arial";</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ctx.fillText("Photo Booth Kantor",900,1100);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const finalImage = layoutCanvas.toDataURL("image/jpeg",1.0);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>result.src = finalImage;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>uploadToDrive(finalImage);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function uploadToDrive(imageData){</p>
-<p class="p2"><br></p>
-<p class="p1">fetch(WEB_APP_URL,{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>method:"POST",</p>
-<p class="p1"><span class="Apple-converted-space">  </span>body:JSON.stringify({image:imageData})</p>
-<p class="p1">})</p>
-<p class="p1">.then(res=&gt;res.json())</p>
-<p class="p1">.then(data=&gt;{</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>generateQR(data.url);</p>
-<p class="p2"><br></p>
-<p class="p1">});</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function generateQR(url){</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById("qrSection").style.display="block";</p>
-<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById("qrcode").innerHTML="";</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>new QRCode(document.getElementById("qrcode"),{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>text:url,</p>
-<p class="p1"><span class="Apple-converted-space">    </span>width:220,</p>
-<p class="p1"><span class="Apple-converted-space">    </span>height:220</p>
-<p class="p1"><span class="Apple-converted-space">  </span>});</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;/script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+<h2>KEMENTERIAN HAJI DAN UMRAH</h2>
+<h3>KABUPATEN MAGELANG</h3>
+
+<div style="position:relative;">
+  <video id="video" autoplay playsinline></video>
+  <div id="countdown"></div>
+</div>
+
+<canvas id="canvas"></canvas>
+<button onclick="startCountdown()">Ambil Foto</button>
+
+<img id="result">
+
+<div id="qrSection">
+  <h3>📱 Scan QR untuk Mengunduh Foto</h3>
+  <div id="qrcode"></div>
+</div>
+
+<script>
+
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz55-o4m_PTZTFk_B2dtZfexxEyy-w-ORv0mEgndBeNNEClGnQrxfv0Wc4lQZ6yMMH2/exec";
+
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const result = document.getElementById("result");
+const countdownEl = document.getElementById("countdown");
+
+navigator.mediaDevices.getUserMedia({
+  video:{facingMode:"user"}
+}).then(stream=>{
+  video.srcObject = stream;
+});
+
+function startCountdown(){
+  let count = 3;
+  countdownEl.innerText = count;
+
+  const interval = setInterval(()=>{
+    count--;
+    if(count>0){
+      countdownEl.innerText = count;
+    }else{
+      clearInterval(interval);
+      countdownEl.innerText="";
+      capture();
+    }
+  },1000);
+}
+
+function capture(){
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video,0,0);
+  generate4R(canvas.toDataURL("image/jpeg",1.0));
+}
+
+function generate4R(photoData){
+
+  const layoutCanvas = document.createElement("canvas");
+  const ctx = layoutCanvas.getContext("2d");
+
+  layoutCanvas.width = 1800;
+  layoutCanvas.height = 1200;
+
+  ctx.fillStyle="#000";
+  ctx.fillRect(0,0,1800,1200);
+
+  ctx.fillStyle="gold";
+  ctx.font="bold 80px Arial";
+  ctx.textAlign="center";
+  ctx.fillText("KEMENTERIAN HAJI DAN UMRAH",900,120);
+  ctx.fillText("KABUPATEN MAGELANG",900,200);
+
+  const img = new Image();
+  img.src = photoData;
+
+  img.onload = function(){
+    ctx.drawImage(img,300,250,1200,750);
+
+    ctx.font="40px Arial";
+    ctx.fillText("Photo Booth Kantor",900,1100);
+
+    const finalImage = layoutCanvas.toDataURL("image/jpeg",1.0);
+    result.src = finalImage;
+
+    uploadToDrive(finalImage);
+  }
+}
+
+function uploadToDrive(imageData){
+
+fetch(WEB_APP_URL,{
+  method:"POST",
+  body:JSON.stringify({image:imageData})
+})
+.then(res=>res.json())
+.then(data=>{
+
+  generateQR(data.url);
+
+});
+}
+
+function generateQR(url){
+
+  document.getElementById("qrSection").style.display="block";
+  document.getElementById("qrcode").innerHTML="";
+
+  new QRCode(document.getElementById("qrcode"),{
+    text:url,
+    width:220,
+    height:220
+  });
+}
+
+</script>
+
 </body>
 </html>
