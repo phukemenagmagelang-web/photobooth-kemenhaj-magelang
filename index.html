@@ -2,34 +2,56 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Event Photobooth</title>
+<title>Photobooth Kemenhaj</title>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
 
 <style>
 body{
     margin:0;
-    font-family:Arial;
-    background:#111;
+    background:#000;
     color:white;
     text-align:center;
+    font-family:Arial;
 }
+
+header{
+    padding:20px;
+}
+
+header img{
+    width:120px;
+}
+
 video{
     width:500px;
     border-radius:10px;
 }
-canvas{
+
+#countdown{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-size:120px;
+    font-weight:bold;
+    color:gold;
+    text-shadow:0 0 20px gold;
     display:none;
 }
+
 button{
-    padding:10px 20px;
-    margin:10px;
+    padding:12px 25px;
     font-size:16px;
+    margin:10px;
 }
+
 #resultImage{
     width:400px;
     margin-top:20px;
 }
+
 #qrcode{
     margin-top:20px;
 }
@@ -37,19 +59,23 @@ button{
 </head>
 <body>
 
-<h2>Event Photobooth</h2>
+<header>
+    <img src="logo.png">
+    <h2>Kementerian Haji dan Umrah Kab. Magelang</h2>
+</header>
 
-<input type="file" id="frameUpload" accept="image/png">
-
-<br><br>
-
-<video id="video" autoplay></video>
+<div style="position:relative;">
+    <video id="video" autoplay></video>
+    <div id="countdown"></div>
+</div>
 
 <br>
 
-<button onclick="startCapture()">Start Photo (3x)</button>
+<input type="file" id="frameUpload" accept="image/png">
+<br>
+<button onclick="startCapture()">START FOTO (3x)</button>
 
-<canvas id="canvas"></canvas>
+<canvas id="canvas" style="display:none;"></canvas>
 
 <br>
 
@@ -65,9 +91,7 @@ let capturedPhotos = [];
 let uploadedFrame = null;
 
 navigator.mediaDevices.getUserMedia({video:true})
-.then(stream => {
-    video.srcObject = stream;
-});
+.then(stream => video.srcObject = stream);
 
 document.getElementById("frameUpload").addEventListener("change", function(e){
     let reader = new FileReader();
@@ -80,23 +104,31 @@ document.getElementById("frameUpload").addEventListener("change", function(e){
 
 function startCapture(){
     capturedPhotos = [];
-    capturePhoto(0);
+    captureWithCountdown(3,0);
 }
 
-function capturePhoto(count){
+function captureWithCountdown(seconds,count){
+
     if(count >= 3){
         generateStrip();
         generateGIF();
         return;
     }
 
-    setTimeout(()=>{
+    let cd = document.getElementById("countdown");
+    cd.style.display = "block";
+    cd.innerText = seconds;
+
+    if(seconds > 0){
+        setTimeout(()=>captureWithCountdown(seconds-1,count),1000);
+    }else{
         canvas.width = 500;
         canvas.height = 400;
         ctx.drawImage(video,0,0,500,400);
         capturedPhotos.push(canvas.toDataURL("image/jpeg"));
-        capturePhoto(count+1);
-    },2000);
+        cd.style.display = "none";
+        setTimeout(()=>captureWithCountdown(3,count+1),1000);
+    }
 }
 
 function generateStrip(){
@@ -105,31 +137,35 @@ function generateStrip(){
     let sctx = strip.getContext("2d");
 
     strip.width = 600;
-    strip.height = 1200;
+    strip.height = 1300;
 
     sctx.fillStyle = "white";
-    sctx.fillRect(0,0,600,1200);
+    sctx.fillRect(0,0,600,1300);
 
-    let loaded = 0;
+    let logo = new Image();
+    logo.src = "logo.png";
 
-    capturedPhotos.forEach((photo,i)=>{
-        let img = new Image();
-        img.src = photo;
-        img.onload = function(){
-            sctx.drawImage(img,50,50+(i*350),500,300);
+    logo.onload = function(){
+        sctx.drawImage(logo,250,20,100,100);
 
-            if(uploadedFrame){
-                sctx.drawImage(uploadedFrame,0,0,600,1200);
+        capturedPhotos.forEach((photo,i)=>{
+            let img = new Image();
+            img.src = photo;
+            img.onload = function(){
+                sctx.drawImage(img,50,150+(i*350),500,300);
+
+                if(uploadedFrame){
+                    sctx.drawImage(uploadedFrame,0,0,600,1300);
+                }
+
+                if(i === 2){
+                    let finalImage = strip.toDataURL("image/jpeg");
+                    document.getElementById("resultImage").src = finalImage;
+                    generateQR(finalImage);
+                }
             }
-
-            loaded++;
-            if(loaded === 3){
-                let finalImage = strip.toDataURL("image/jpeg");
-                document.getElementById("resultImage").src = finalImage;
-                generateQR(finalImage);
-            }
-        }
-    });
+        });
+    }
 }
 
 function generateGIF(){
@@ -159,9 +195,9 @@ function generateGIF(){
 }
 
 function generateQR(dataURL){
-    document.getElementById("qrcode").innerHTML = "";
-    new QRCode(document.getElementById("qrcode"), {
-        text: dataURL,
+    document.getElementById("qrcode").innerHTML="";
+    new QRCode(document.getElementById("qrcode"),{
+        text:dataURL,
         width:150,
         height:150
     });
